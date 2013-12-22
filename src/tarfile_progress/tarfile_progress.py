@@ -57,7 +57,6 @@ class TarFile(tarfile.TarFile):
         changed :class:`TarInfo` object. If it instead returns :const:`None` the :class:`TarInfo`
         object will be excluded from the archive. See :ref:`tar-examples` for an
         example.
-        
         *progress* will be called with a signal integer with a value between 0 and 100,
         which represents the percentage of the file that has been added.
 
@@ -65,13 +64,10 @@ class TarFile(tarfile.TarFile):
             Progress will be reported on a file-by-file basis. This means that the precentaged
             passed will reset to zero on every new file. This is perticualy important is you are
             using the *recursive* flag.
-        
         ..  versionchanged:: 2.6
             Added the *exclude* parameter.
-        
         ..  versionchanged:: 2.7
             Added the *filter* parameter.
-        
         ..  deprecated:: 2.7
             The *exclude* parameter is deprecated, please use the *filter* parameter
             instead.  For maximum portability, *filter* should be used as a keyword
@@ -173,8 +169,8 @@ class filewrapper(object):
 
     def __init__(self, fileobj, tarinfo, progress):
         self._fileobj = fileobj
-
         self._size = tarinfo.size
+        self._path = tarinfo.path
 
         if self._size <= 0 or self._size is None:
             # Invalid size, we will not bother with the progress
@@ -197,7 +193,7 @@ class filewrapper(object):
             progress = (self._totalread * 100) / self._size
 
             if progress > self._lastprogress and progress <= 100:
-                self._progress(progress)
+                self._progress(progress,self._path)
                 self._lastprogress = progress
 
     def read(self, size= -1):
